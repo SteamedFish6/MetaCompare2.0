@@ -16,7 +16,7 @@ def generate_annotation(contig_file, out_dir, nthread = '64'):
 
 	if not os.path.exists(prodigal_file):
 		print("Running Prodigal")
-		subprocess.call(["pprodigal", "-i", contig_file, "-d", prodigal_file, "-p", "meta", "-C", "4000", "-T", "32", "-o", os.path.join(out_dir, "prodigal_log")])
+		subprocess.call(["pprodigal", "-i", contig_file, "-d", prodigal_file, "-p", "meta", "-C", "4000", "-T", nthread, "-o", os.path.join(out_dir, "prodigal_log")])
 	else:
 		print("Skipping: Prodigal output already exists")
 
@@ -51,10 +51,10 @@ def generate_annotation(contig_file, out_dir, nthread = '64'):
 	pathogen_name = sample_name + "_Pathogens.tsv"
 	if not os.path.exists(os.path.join(out_dir, pathogen_name)):
 		print('Running mmseq2 on GTDB')
-		command = ['sh', os.path.dirname(os.path.abspath(__file__))+"mmseq.sh", contig_file, out_dir, pathogen_name]		
+		mmseqs_db = os.path.dirname(os.path.abspath(__file__))+"/metacmpDB/GTDB/gtdb"
 		if(out_dir != "" and not out_dir.endswith('/')):
 			out_dir += "/"		
-		subprocess.call(['sh', os.path.dirname(os.path.abspath(__file__))+"/./mmseq.sh", contig_file, out_dir, pathogen_name])
+		subprocess.call(['sh', os.path.dirname(os.path.abspath(__file__))+"/mmseq.sh", contig_file, out_dir, pathogen_name, mmseqs_db, nthread])
 		try:
 			shutil.rmtree(os.path.join(out_dir, "sample.tmpFolder"))
 			for f in glob.glob(os.path.join(out_dir, "sample.contigs*")):
